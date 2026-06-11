@@ -433,10 +433,10 @@ export const ca: TranslationStructure = {
             title: 'MODE DE PERMISOS GEMINI',
             default: 'Per defecte',
             readOnly: 'Només lectura',
-            safeYolo: 'YOLO segur',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: 'Només lectura',
-            badgeSafeYolo: 'YOLO segur',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -445,6 +445,10 @@ export const ca: TranslationStructure = {
         suggestion: {
             fileLabel: 'FITXER',
             folderLabel: 'CARPETA',
+        },
+        plusMenu: {
+            voiceCall: 'Trucada de veu',
+            pushToTalk: 'Prem per parlar',
         },
         noMachinesAvailable: 'Sense màquines',
     },
@@ -563,7 +567,69 @@ export const ca: TranslationStructure = {
             title: 'Idiomes',
             footer: ({ count }: { count: number }) => `${count} ${plural({ count, singular: 'idioma', plural: 'idiomes' })} disponibles`,
             autoDetect: 'Detecta automàticament',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'Prompt del sistema',
+        systemPromptDescription: 'Personalitza les instruccions donades a l\'assistent de veu',
+        systemPrompt: 'Prompt personalitzat',
+        systemPromptSubtitle: 'Defineix com es comporta l\'assistent de veu',
+        systemPromptDefault: 'Predeterminat',
+        systemPromptEdit: {
+            description: 'Introdueix un prompt de sistema personalitzat per canviar com es comporta l\'assistent de veu. Deixa buit per utilitzar el prompt predeterminat.',
+            placeholder: 'Introdueix el teu prompt de sistema personalitzat...',
+            reset: 'Esborra',
+            useDefault: 'Utilitza predeterminat',
+            hint: 'El prompt del sistema defineix la personalitat i les capacitats de l\'assistent de veu. Es combinarà amb el context de la sessió en iniciar una sessió de veu.',
+        },
+        // Provider settings
+        providerTitle: 'Proveïdor de veu',
+        providerDescription: 'Selecciona i configura el teu proveïdor d\'assistent de veu',
+        providerLabel: 'Proveïdor',
+        providerSubtitle: 'Tria quin servei de veu utilitzar',
+        providerNotConfigured: 'No configurat',
+        provider: {
+            selectTitle: 'Selecciona proveïdor',
+            selectDescription: 'Tria un proveïdor de veu per a interaccions de veu en temps real',
+            stepfunConfig: 'Configuració de StepFun',
+            stepfunConfigDescription: 'Configura les teves credencials i preferències de l\'API de StepFun',
+            elevenLabsConfig: 'Configuració d\'ElevenLabs',
+            elevenLabsConfigDescription: 'Configura els ajustos de l\'agent d\'ElevenLabs',
+            apiKeyPlaceholder: 'Introdueix la teva clau API de StepFun',
+            model: 'Model',
+            voice: 'Veu',
+            agentIdDevPlaceholder: 'Agent ID (Desenvolupament)',
+            agentIdProdPlaceholder: 'Agent ID (Producció)',
+        },
+        // ASR (reconeixement de veu) configuració
+        asr: {
+            title: 'Entrada de veu (ASR)',
+            description: 'Conversió de veu a text per al mode d\'entrada de veu',
+            apiKeyNote: 'Nota: StepFun ASR utilitza la mateixa clau API que el proveïdor de veu anterior. Si us plau, configura-la a la secció de StepFun.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Connectant...',
+            speaking: 'Parlant',
+            listening: 'Escoltant...',
+            muted: 'Silenciat',
+            voiceAssistant: 'Assistent de veu',
+            you: 'TU',
+            assistant: 'ASSISTENT',
+            startSpeaking: 'Comença a parlar...',
+            waiting: 'Esperant...',
+            microphoneMuted: 'El micròfon està silenciat',
+            end: 'Finalitzar',
+        },
+    },
+
+    // Superposició d'entrada de veu
+    voiceInput: {
+        holdToSpeak: 'Mantén premut per parlar',
+        recording: 'Deixa anar per enviar',
+        cancel: 'Cancel·la',
+        slideToText: 'Llisca aquí per convertir',
+        releaseToSend: 'Deixa anar per enviar',
+        transcribing: 'Reconeixent...',
     },
 
     settingsAccount: {

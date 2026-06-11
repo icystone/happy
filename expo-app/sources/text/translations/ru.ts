@@ -192,6 +192,7 @@ export const ru: TranslationStructure = {
         enhancedSessionWizardDisabled: 'Используется стандартный лаунчер',
     },
 
+
     errors: {
         networkError: 'Произошла ошибка сети',
         serverError: 'Произошла ошибка сервера',
@@ -456,6 +457,10 @@ export const ru: TranslationStructure = {
             fileLabel: 'ФАЙЛ',
             folderLabel: 'ПАПКА',
         },
+        plusMenu: {
+            voiceCall: 'Голосовой звонок',
+            pushToTalk: 'Нажмите, чтобы говорить',
+        },
         noMachinesAvailable: 'Нет машин',
     },
 
@@ -573,7 +578,69 @@ export const ru: TranslationStructure = {
             title: 'Языки',
             footer: ({ count }: { count: number }) => `Доступно ${count} ${plural({ count, one: 'язык', few: 'языка', many: 'языков' })}`,
             autoDetect: 'Автоопределение',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'Системный промпт',
+        systemPromptDescription: 'Настройте инструкции для голосового помощника',
+        systemPrompt: 'Пользовательский промпт',
+        systemPromptSubtitle: 'Определите поведение голосового помощника',
+        systemPromptDefault: 'По умолчанию',
+        systemPromptEdit: {
+            description: 'Введите пользовательский системный промпт, чтобы изменить поведение голосового помощника. Оставьте пустым для использования промпта по умолчанию.',
+            placeholder: 'Введите ваш системный промпт...',
+            reset: 'Очистить',
+            useDefault: 'По умолчанию',
+            hint: 'Системный промпт определяет личность и возможности голосового помощника. Он будет объединён с контекстом сессии при запуске голосовой сессии.',
+        },
+        // Provider settings
+        providerTitle: 'Голосовой провайдер',
+        providerDescription: 'Выберите и настройте провайдера голосового помощника',
+        providerLabel: 'Провайдер',
+        providerSubtitle: 'Выберите, какой голосовой сервис использовать',
+        providerNotConfigured: 'Не настроено',
+        provider: {
+            selectTitle: 'Выбрать провайдера',
+            selectDescription: 'Выберите голосового провайдера для голосового взаимодействия в реальном времени',
+            stepfunConfig: 'Настройка StepFun',
+            stepfunConfigDescription: 'Настройте учётные данные и предпочтения StepFun API',
+            elevenLabsConfig: 'Настройка ElevenLabs',
+            elevenLabsConfigDescription: 'Настройте параметры агента ElevenLabs',
+            apiKeyPlaceholder: 'Введите ваш StepFun API ключ',
+            model: 'Модель',
+            voice: 'Голос',
+            agentIdDevPlaceholder: 'Agent ID (разработка)',
+            agentIdProdPlaceholder: 'Agent ID (продакшен)',
+        },
+        // ASR (распознавание речи) настройки
+        asr: {
+            title: 'Голосовой ввод (ASR)',
+            description: 'Преобразование речи в текст для режима голосового ввода',
+            apiKeyNote: 'Примечание: StepFun ASR использует тот же API-ключ, что и голосовой провайдер выше. Пожалуйста, настройте его в разделе StepFun.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Подключение...',
+            speaking: 'Говорит',
+            listening: 'Слушает...',
+            muted: 'Без звука',
+            voiceAssistant: 'Голосовой помощник',
+            you: 'ВЫ',
+            assistant: 'ПОМОЩНИК',
+            startSpeaking: 'Начните говорить...',
+            waiting: 'Ожидание...',
+            microphoneMuted: 'Микрофон отключён',
+            end: 'Завершить',
+        },
+    },
+
+    // Оверлей голосового ввода
+    voiceInput: {
+        holdToSpeak: 'Удерживайте, чтобы говорить',
+        recording: 'Отпустите для отправки',
+        cancel: 'Отмена',
+        slideToText: 'Сдвиньте сюда для преобразования',
+        releaseToSend: 'Отпустите для отправки',
+        transcribing: 'Распознавание...',
     },
 
     settingsAccount: {

@@ -239,6 +239,7 @@ export const it: TranslationStructure = {
         enhancedSessionWizardDisabled: 'Usando avvio sessioni standard',
     },
 
+
     errors: {
         networkError: 'Si è verificato un errore di rete',
         serverError: 'Si è verificato un errore del server',
@@ -462,10 +463,10 @@ export const it: TranslationStructure = {
             title: 'MODALITÀ PERMESSI GEMINI',
             default: 'Predefinito',
             readOnly: 'Solo lettura',
-            safeYolo: 'YOLO sicuro',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: 'Solo lettura',
-            badgeSafeYolo: 'YOLO sicuro',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -474,6 +475,10 @@ export const it: TranslationStructure = {
         suggestion: {
             fileLabel: 'FILE',
             folderLabel: 'CARTELLA',
+        },
+        plusMenu: {
+            voiceCall: 'Chiamata vocale',
+            pushToTalk: 'Premi per parlare',
         },
         noMachinesAvailable: 'Nessuna macchina',
     },
@@ -592,7 +597,69 @@ export const it: TranslationStructure = {
             title: 'Lingue',
             footer: ({ count }: { count: number }) => `${count} ${plural({ count, singular: 'lingua', plural: 'lingue' })} disponibili`,
             autoDetect: 'Rilevamento automatico',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'Prompt di sistema',
+        systemPromptDescription: 'Personalizza le istruzioni fornite all\'assistente vocale',
+        systemPrompt: 'Prompt personalizzato',
+        systemPromptSubtitle: 'Definisci come si comporta l\'assistente vocale',
+        systemPromptDefault: 'Predefinito',
+        systemPromptEdit: {
+            description: 'Inserisci un prompt di sistema personalizzato per cambiare il comportamento dell\'assistente vocale. Lascia vuoto per usare il prompt predefinito.',
+            placeholder: 'Inserisci il tuo prompt di sistema personalizzato...',
+            reset: 'Cancella',
+            useDefault: 'Usa predefinito',
+            hint: 'Il prompt di sistema definisce la personalità e le capacità dell\'assistente vocale. Verrà combinato con il contesto della sessione all\'avvio di una sessione vocale.',
+        },
+        // Provider settings
+        providerTitle: 'Provider vocale',
+        providerDescription: 'Seleziona e configura il tuo provider di assistente vocale',
+        providerLabel: 'Provider',
+        providerSubtitle: 'Scegli quale servizio vocale utilizzare',
+        providerNotConfigured: 'Non configurato',
+        provider: {
+            selectTitle: 'Seleziona provider',
+            selectDescription: 'Scegli un provider vocale per interazioni vocali in tempo reale',
+            stepfunConfig: 'Configurazione StepFun',
+            stepfunConfigDescription: 'Configura le credenziali e le preferenze API di StepFun',
+            elevenLabsConfig: 'Configurazione ElevenLabs',
+            elevenLabsConfigDescription: 'Configura le impostazioni dell\'agente ElevenLabs',
+            apiKeyPlaceholder: 'Inserisci la tua chiave API StepFun',
+            model: 'Modello',
+            voice: 'Voce',
+            agentIdDevPlaceholder: 'Agent ID (Sviluppo)',
+            agentIdProdPlaceholder: 'Agent ID (Produzione)',
+        },
+        // ASR (riconoscimento vocale) impostazioni
+        asr: {
+            title: 'Input vocale (ASR)',
+            description: 'Conversione voce-testo per la modalità di input vocale',
+            apiKeyNote: 'Nota: StepFun ASR utilizza la stessa chiave API del provider vocale sopra. Configurala nella sezione StepFun.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Connessione...',
+            speaking: 'Sta parlando',
+            listening: 'In ascolto...',
+            muted: 'Silenziato',
+            voiceAssistant: 'Assistente vocale',
+            you: 'TU',
+            assistant: 'ASSISTENTE',
+            startSpeaking: 'Inizia a parlare...',
+            waiting: 'In attesa...',
+            microphoneMuted: 'Il microfono è silenziato',
+            end: 'Termina',
+        },
+    },
+
+    // Overlay di input vocale
+    voiceInput: {
+        holdToSpeak: 'Tieni premuto per parlare',
+        recording: 'Rilascia per inviare',
+        cancel: 'Annulla',
+        slideToText: 'Scorri qui per convertire',
+        releaseToSend: 'Rilascia per inviare',
+        transcribing: 'Riconoscimento...',
     },
 
     settingsAccount: {

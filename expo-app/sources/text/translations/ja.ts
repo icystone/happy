@@ -465,10 +465,10 @@ export const ja: TranslationStructure = {
             title: 'GEMINI権限モード',
             default: 'デフォルト',
             readOnly: '読み取り専用',
-            safeYolo: '安全YOLO',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: '読み取り専用',
-            badgeSafeYolo: '安全YOLO',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -477,6 +477,10 @@ export const ja: TranslationStructure = {
         suggestion: {
             fileLabel: 'ファイル',
             folderLabel: 'フォルダ',
+        },
+        plusMenu: {
+            voiceCall: '音声通話',
+            pushToTalk: '押して話す',
         },
         noMachinesAvailable: 'マシンなし',
     },
@@ -595,7 +599,69 @@ export const ja: TranslationStructure = {
             title: '言語',
             footer: ({ count }: { count: number }) => `${count}言語が利用可能`,
             autoDetect: '自動検出',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'システムプロンプト',
+        systemPromptDescription: '音声アシスタントへの指示をカスタマイズ',
+        systemPrompt: 'カスタムプロンプト',
+        systemPromptSubtitle: '音声アシスタントの動作を定義',
+        systemPromptDefault: 'デフォルト',
+        systemPromptEdit: {
+            description: 'カスタムシステムプロンプトを入力して、音声アシスタントの動作を変更します。デフォルトのプロンプトを使用する場合は空のままにしてください。',
+            placeholder: 'カスタムシステムプロンプトを入力...',
+            reset: 'クリア',
+            useDefault: 'デフォルトを使用',
+            hint: 'システムプロンプトは音声アシスタントの性格と機能を定義します。音声セッション開始時にセッションコンテキストと組み合わされます。',
+        },
+        // Provider settings
+        providerTitle: '音声プロバイダー',
+        providerDescription: '音声アシスタントプロバイダーを選択して設定',
+        providerLabel: 'プロバイダー',
+        providerSubtitle: '使用する音声サービスを選択',
+        providerNotConfigured: '未設定',
+        provider: {
+            selectTitle: 'プロバイダーを選択',
+            selectDescription: 'リアルタイム音声対話用の音声プロバイダーを選択',
+            stepfunConfig: 'StepFun 設定',
+            stepfunConfigDescription: 'StepFun API の資格情報と設定を構成',
+            elevenLabsConfig: 'ElevenLabs 設定',
+            elevenLabsConfigDescription: 'ElevenLabs エージェントの設定を構成',
+            apiKeyPlaceholder: 'StepFun API キーを入力',
+            model: 'モデル',
+            voice: '音声',
+            agentIdDevPlaceholder: 'Agent ID（開発）',
+            agentIdProdPlaceholder: 'Agent ID（本番）',
+        },
+        // ASR (音声認識) 設定
+        asr: {
+            title: '音声入力 (ASR)',
+            description: '音声入力モード用の音声テキスト変換',
+            apiKeyNote: '注意：StepFun ASRは上記の音声プロバイダーと同じAPIキーを使用します。StepFunセクションで設定してください。',
+        },
+        // Voice panel
+        panel: {
+            connecting: '接続中...',
+            speaking: '話し中',
+            listening: '聞いています...',
+            muted: 'ミュート',
+            voiceAssistant: '音声アシスタント',
+            you: 'あなた',
+            assistant: 'アシスタント',
+            startSpeaking: '話し始めてください...',
+            waiting: '待機中...',
+            microphoneMuted: 'マイクがミュートされています',
+            end: '終了',
+        },
+    },
+
+    // 音声入力オーバーレイ
+    voiceInput: {
+        holdToSpeak: '押して話す',
+        recording: '離して送信',
+        cancel: 'キャンセル',
+        slideToText: 'ここにスライドして変換',
+        releaseToSend: '離して送信',
+        transcribing: '認識中...',
     },
 
     settingsAccount: {

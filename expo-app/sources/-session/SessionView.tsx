@@ -9,10 +9,10 @@ import { VoiceAssistantStatusBar } from '@/components/VoiceAssistantStatusBar';
 import { useDraft } from '@/hooks/useDraft';
 import { Modal } from '@/modal';
 import { voiceHooks } from '@/realtime/hooks/voiceHooks';
-import { startRealtimeSession, stopRealtimeSession } from '@/realtime/RealtimeSession';
+import { startRealtimeSession, stopRealtimeSession, startPTTMode, stopPTTMode } from '@/realtime/RealtimeSession';
 import { gitStatusSync } from '@/sync/gitStatusSync';
 import { sessionAbort } from '@/sync/ops';
-import { storage, useIsDataReady, useLocalSetting, useRealtimeStatus, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
+import { storage, useIsDataReady, useLocalSetting, useRealtimeStatus, useRealtimePTTMode, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
 import { useSession } from '@/sync/storage';
 import { Session } from '@/sync/storageTypes';
 import { sync } from '@/sync/sync';
@@ -20,7 +20,7 @@ import { t } from '@/text';
 import { tracking, trackMessageSent } from '@/track';
 import { isRunningOnMac } from '@/utils/platform';
 import { useDeviceType, useHeaderHeight, useIsLandscape, useIsTablet } from '@/utils/responsive';
-import { formatPathRelativeToHome, getSessionAvatarId, getSessionName, useSessionStatus } from '@/utils/sessionUtils';
+import { getSessionAvatarId, getSessionName, getSessionSubtitle, useSessionStatus } from '@/utils/sessionUtils';
 import { isVersionSupported, MINIMUM_CLI_VERSION } from '@/utils/versionUtils';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -42,6 +42,7 @@ export const SessionView = React.memo((props: { id: string }) => {
     const headerHeight = useHeaderHeight();
     const realtimeStatus = useRealtimeStatus();
     const isTablet = useIsTablet();
+    const [settingsOpen, setSettingsOpen] = React.useState(false);
 
     // Compute header props based on session state
     const headerProps = useMemo(() => {
@@ -71,9 +72,10 @@ export const SessionView = React.memo((props: { id: string }) => {
 
         // Normal state - show session info
         const isConnected = session.presence === 'online';
+        const subtitle = getSessionSubtitle(session);
         return {
             title: getSessionName(session),
-            subtitle: session.metadata?.path ? formatPathRelativeToHome(session.metadata.path, session.metadata?.homeDir) : undefined,
+            subtitle: subtitle === t('status.unknown') ? undefined : subtitle,
             avatarId: getSessionAvatarId(session),
             onAvatarPress: () => router.push(`/session/${sessionId}/info`),
             isConnected: isConnected,
@@ -141,7 +143,13 @@ export const SessionView = React.memo((props: { id: string }) => {
                     </View>
                 ) : (
                     // Normal session view
-                    <SessionViewLoaded key={sessionId} sessionId={sessionId} session={session} />
+                    <SessionViewLoaded
+                        key={sessionId}
+                        sessionId={sessionId}
+                        session={session}
+                        settingsOpen={settingsOpen}
+                        onSettingsOpenChange={setSettingsOpen}
+                    />
                 )}
             </View>
         </>
@@ -149,7 +157,17 @@ export const SessionView = React.memo((props: { id: string }) => {
 });
 
 
-function SessionViewLoaded({ sessionId, session }: { sessionId: string, session: Session }) {
+function SessionViewLoaded({
+    sessionId,
+    session,
+    settingsOpen,
+    onSettingsOpenChange,
+}: {
+    sessionId: string;
+    session: Session;
+    settingsOpen: boolean;
+    onSettingsOpenChange: (open: boolean) => void;
+}) {
     const { theme } = useUnistyles();
     const router = useRouter();
     const safeArea = useSafeAreaInsets();
@@ -157,6 +175,7 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
     const deviceType = useDeviceType();
     const [message, setMessage] = React.useState('');
     const realtimeStatus = useRealtimeStatus();
+    const isPTTMode = useRealtimePTTMode();
     const { messages, isLoaded } = useSessionMessages(sessionId);
     const acknowledgedCliVersions = useLocalSetting('acknowledgedCliVersions');
 
@@ -178,6 +197,9 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
 
     // Use draft hook for auto-saving message drafts
     const { clearDraft } = useDraft(sessionId, message, setMessage);
+
+    // Input mode state (keyboard vs voice)
+    const [inputMode, setInputMode] = React.useState<'keyboard' | 'voice'>('keyboard');
 
     // Handle dismissing CLI version warning
     const handleDismissCliWarning = React.useCallback(() => {
@@ -236,11 +258,37 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
         }
     }, [realtimeStatus, sessionId]);
 
+    // Handle long press start for PTT (Push-to-Talk) mode
+    const handleMicLongPressStart = React.useCallback(async () => {
+        if (realtimeStatus === 'connecting') {
+            return;
+        }
+        try {
+            const initialPrompt = voiceHooks.onVoiceStarted(sessionId);
+            await startPTTMode(sessionId, initialPrompt);
+            tracking?.capture('voice_ptt_started', { sessionId });
+        } catch (error) {
+            console.error('Failed to start PTT mode:', error);
+            Modal.alert(t('common.error'), t('errors.voiceSessionFailed'));
+        }
+    }, [realtimeStatus, sessionId]);
+
+    // Handle long press end for PTT mode
+    const handleMicLongPressEnd = React.useCallback(() => {
+        if (isPTTMode) {
+            stopPTTMode();
+            tracking?.capture('voice_ptt_released', { sessionId });
+        }
+    }, [isPTTMode, sessionId]);
+
     // Memoize mic button state to prevent flashing during chat transitions
     const micButtonState = useMemo(() => ({
         onMicPress: handleMicrophonePress,
+        onMicLongPressStart: handleMicLongPressStart,
+        onMicLongPressEnd: handleMicLongPressEnd,
+        isPTTMode: isPTTMode,
         isMicActive: realtimeStatus === 'connected' || realtimeStatus === 'connecting'
-    }), [handleMicrophonePress, realtimeStatus]);
+    }), [handleMicrophonePress, handleMicLongPressStart, handleMicLongPressEnd, isPTTMode, realtimeStatus]);
 
     // Trigger session visibility and initialize git status sync
     React.useLayoutEffect(() => {
@@ -278,8 +326,16 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
             value={message}
             onChangeText={setMessage}
             sessionId={sessionId}
+            // Input mode (keyboard/voice toggle)
+            inputMode={inputMode}
+            onInputModeChange={setInputMode}
+            // Voice call (realtime voice) - existing functionality
+            onVoiceCallPress={micButtonState.onMicPress}
             permissionMode={permissionMode}
             onPermissionModeChange={updatePermissionMode}
+            settingsOpen={settingsOpen}
+            onSettingsOpenChange={onSettingsOpenChange}
+            showSettingsButton={false}
             modelMode={modelMode as any}
             onModelModeChange={updateModelMode as any}
             metadata={session.metadata}
@@ -289,15 +345,24 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
                 dotColor: sessionStatus.statusDotColor,
                 isPulsing: sessionStatus.isPulsing
             }}
-            onSend={() => {
-                if (message.trim()) {
+            onSend={(text?: string) => {
+                const content = typeof text === 'string' ? text : message;
+                const trimmed = content.trim();
+                if (!trimmed) {
+                    return;
+                }
+                const shouldClear = typeof text !== 'string' || message.trim() === trimmed;
+                if (shouldClear) {
                     setMessage('');
                     clearDraft();
-                    sync.sendMessage(sessionId, message);
-                    trackMessageSent();
                 }
+                sync.sendMessage(sessionId, content);
+                trackMessageSent();
             }}
             onMicPress={micButtonState.onMicPress}
+            onMicLongPressStart={micButtonState.onMicLongPressStart}
+            onMicLongPressEnd={micButtonState.onMicLongPressEnd}
+            isPTTMode={micButtonState.isPTTMode}
             isMicActive={micButtonState.isMicActive}
             onAbort={() => sessionAbort(sessionId)}
             showAbortButton={sessionStatus.state === 'thinking' || sessionStatus.state === 'waiting'}

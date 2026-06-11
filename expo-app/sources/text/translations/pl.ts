@@ -221,6 +221,7 @@ export const pl: TranslationStructure = {
         enhancedSessionWizardDisabled: 'Używanie standardowego launchera sesji',
     },
 
+
     errors: {
         networkError: 'Wystąpił błąd sieci',
         serverError: 'Wystąpił błąd serwera',
@@ -443,10 +444,10 @@ export const pl: TranslationStructure = {
             title: 'TRYB UPRAWNIEŃ GEMINI',
             default: 'Domyślny',
             readOnly: 'Tylko do odczytu',
-            safeYolo: 'Bezpieczny YOLO',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: 'Tylko do odczytu',
-            badgeSafeYolo: 'Bezpieczny YOLO',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -455,6 +456,10 @@ export const pl: TranslationStructure = {
         suggestion: {
             fileLabel: 'PLIK',
             folderLabel: 'FOLDER',
+        },
+        plusMenu: {
+            voiceCall: 'Połączenie głosowe',
+            pushToTalk: 'Naciśnij, aby mówić',
         },
         noMachinesAvailable: 'Brak maszyn',
     },
@@ -573,7 +578,69 @@ export const pl: TranslationStructure = {
             title: 'Języki',
             footer: ({ count }: { count: number }) => `Dostępnych ${count} ${plural({ count, one: 'język', few: 'języki', many: 'języków' })}`,
             autoDetect: 'Automatyczne wykrywanie',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'Prompt systemowy',
+        systemPromptDescription: 'Dostosuj instrukcje dla asystenta głosowego',
+        systemPrompt: 'Własny prompt',
+        systemPromptSubtitle: 'Określ zachowanie asystenta głosowego',
+        systemPromptDefault: 'Domyślny',
+        systemPromptEdit: {
+            description: 'Wprowadź własny prompt systemowy, aby zmienić zachowanie asystenta głosowego. Pozostaw puste, aby użyć domyślnego promptu.',
+            placeholder: 'Wprowadź własny prompt systemowy...',
+            reset: 'Wyczyść',
+            useDefault: 'Użyj domyślnego',
+            hint: 'Prompt systemowy definiuje osobowość i możliwości asystenta głosowego. Zostanie połączony z kontekstem sesji podczas uruchamiania sesji głosowej.',
+        },
+        // Provider settings
+        providerTitle: 'Dostawca głosu',
+        providerDescription: 'Wybierz i skonfiguruj dostawcę asystenta głosowego',
+        providerLabel: 'Dostawca',
+        providerSubtitle: 'Wybierz, którego serwisu głosowego użyć',
+        providerNotConfigured: 'Nie skonfigurowano',
+        provider: {
+            selectTitle: 'Wybierz dostawcę',
+            selectDescription: 'Wybierz dostawcę głosu do interakcji głosowych w czasie rzeczywistym',
+            stepfunConfig: 'Konfiguracja StepFun',
+            stepfunConfigDescription: 'Skonfiguruj poświadczenia i preferencje API StepFun',
+            elevenLabsConfig: 'Konfiguracja ElevenLabs',
+            elevenLabsConfigDescription: 'Skonfiguruj ustawienia agenta ElevenLabs',
+            apiKeyPlaceholder: 'Wprowadź klucz API StepFun',
+            model: 'Model',
+            voice: 'Głos',
+            agentIdDevPlaceholder: 'Agent ID (deweloperski)',
+            agentIdProdPlaceholder: 'Agent ID (produkcyjny)',
+        },
+        // ASR (rozpoznawanie mowy) ustawienia
+        asr: {
+            title: 'Wejście głosowe (ASR)',
+            description: 'Zamiana mowy na tekst dla trybu głosowego',
+            apiKeyNote: 'Uwaga: StepFun ASR używa tego samego klucza API co powyższy dostawca głosu. Skonfiguruj go w sekcji StepFun.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Łączenie...',
+            speaking: 'Mówi',
+            listening: 'Słucha...',
+            muted: 'Wyciszony',
+            voiceAssistant: 'Asystent głosowy',
+            you: 'TY',
+            assistant: 'ASYSTENT',
+            startSpeaking: 'Zacznij mówić...',
+            waiting: 'Oczekiwanie...',
+            microphoneMuted: 'Mikrofon jest wyciszony',
+            end: 'Zakończ',
+        },
+    },
+
+    // Nakładka wejścia głosowego
+    voiceInput: {
+        holdToSpeak: 'Przytrzymaj, aby mówić',
+        recording: 'Puść, aby wysłać',
+        cancel: 'Anuluj',
+        slideToText: 'Przesuń tutaj, aby przekonwertować',
+        releaseToSend: 'Puść, aby wysłać',
+        transcribing: 'Rozpoznawanie...',
     },
 
     settingsAccount: {

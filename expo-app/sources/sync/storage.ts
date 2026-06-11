@@ -57,7 +57,7 @@ interface SessionMessages {
 
 // Unified list item type for SessionsList component
 export type SessionListViewItem =
-    | { type: 'header'; title: string }
+    | { type: 'header'; title: string; collapsible?: boolean; sectionId?: string; sessionCount?: number }
     | { type: 'active-sessions'; sessions: Session[] }
     | { type: 'project-group'; displayPath: string; machine: Machine }
     | { type: 'session'; session: Session; variant?: 'default' | 'no-path' };
@@ -88,6 +88,9 @@ interface StorageState {
     friendsLoaded: boolean;  // True after initial friends fetch
     realtimeStatus: 'disconnected' | 'connecting' | 'connected' | 'error';
     realtimeMode: 'idle' | 'speaking';
+    realtimeMuted: boolean;
+    realtimePTTMode: boolean;  // Push-to-talk mode: recording while pressed
+    realtimePTTWaitingForResponse: boolean;  // Waiting for AI response after PTT release
     socketStatus: 'disconnected' | 'connecting' | 'connected' | 'error';
     socketLastConnectedAt: number | null;
     socketLastDisconnectedAt: number | null;
@@ -112,6 +115,9 @@ interface StorageState {
     isMutableToolCall: (sessionId: string, callId: string) => boolean;
     setRealtimeStatus: (status: 'disconnected' | 'connecting' | 'connected' | 'error') => void;
     setRealtimeMode: (mode: 'idle' | 'speaking', immediate?: boolean) => void;
+    setRealtimeMuted: (muted: boolean) => void;
+    setRealtimePTTMode: (active: boolean) => void;
+    setRealtimePTTWaitingForResponse: (waiting: boolean) => void;
     clearRealtimeModeDebounce: () => void;
     setSocketStatus: (status: 'disconnected' | 'connecting' | 'connected' | 'error') => void;
     getActiveSessions: () => Session[];
@@ -145,32 +151,61 @@ interface StorageState {
     // Feed methods
     applyFeedItems: (items: FeedItem[]) => void;
     clearFeed: () => void;
+    // Session pinning methods
+    pinSession: (sessionId: string) => void;
+    unpinSession: (sessionId: string) => void;
+    isSessionPinned: (sessionId: string) => boolean;
+    // Voice transcript methods
+    addVoiceMessage: (sessionId: string, type: 'user' | 'assistant', text: string) => void;
 }
 
 // Helper function to build unified list view data from sessions and machines
 function buildSessionListViewData(
-    sessions: Record<string, Session>
+    sessions: Record<string, Session>,
+    pinnedSessionIds: string[] = []
 ): SessionListViewItem[] {
-    // Separate active and inactive sessions
+    const pinnedSet = new Set(pinnedSessionIds);
+
+    // Separate pinned, active (non-pinned), and inactive (non-pinned) sessions
+    const pinnedSessions: Session[] = [];
     const activeSessions: Session[] = [];
     const inactiveSessions: Session[] = [];
 
     Object.values(sessions).forEach(session => {
-        if (isSessionActive(session)) {
+        if (pinnedSet.has(session.id)) {
+            // Pinned sessions go to pinned group regardless of active status
+            pinnedSessions.push(session);
+        } else if (isSessionActive(session)) {
             activeSessions.push(session);
         } else {
             inactiveSessions.push(session);
         }
     });
 
-    // Sort sessions by updated date (newest first)
+    // Sort pinned sessions by their order in pinnedSessionIds (preserve user's order)
+    pinnedSessions.sort((a, b) => pinnedSessionIds.indexOf(a.id) - pinnedSessionIds.indexOf(b.id));
+    // Sort other sessions by updated date (newest first)
     activeSessions.sort((a, b) => b.updatedAt - a.updatedAt);
     inactiveSessions.sort((a, b) => b.updatedAt - a.updatedAt);
 
     // Build unified list view data
     const listData: SessionListViewItem[] = [];
 
-    // Add active sessions as a single item at the top (if any)
+    // Add pinned sessions section FIRST (at the very top)
+    if (pinnedSessions.length > 0) {
+        listData.push({
+            type: 'header',
+            title: 'Pinned',
+            collapsible: false,
+            sectionId: 'pinned',
+            sessionCount: pinnedSessions.length
+        });
+        pinnedSessions.forEach(sess => {
+            listData.push({ type: 'session', session: sess, variant: 'default' });
+        });
+    }
+
+    // Add active sessions (non-pinned) as a single item
     if (activeSessions.length > 0) {
         listData.push({ type: 'active-sessions', sessions: activeSessions });
     }
@@ -204,7 +239,13 @@ function buildSessionListViewData(
                     headerTitle = `${diffDays} days ago`;
                 }
 
-                listData.push({ type: 'header', title: headerTitle });
+                listData.push({
+                    type: 'header',
+                    title: headerTitle,
+                    collapsible: true,
+                    sectionId: `date-${sessionDateOnly.toISOString().split('T')[0]}`,
+                    sessionCount: currentDateGroup.length
+                });
                 currentDateGroup.forEach(sess => {
                     listData.push({ type: 'session', session: sess });
                 });
@@ -234,7 +275,13 @@ function buildSessionListViewData(
             headerTitle = `${diffDays} days ago`;
         }
 
-        listData.push({ type: 'header', title: headerTitle });
+        listData.push({
+            type: 'header',
+            title: headerTitle,
+            collapsible: true,
+            sectionId: `date-${sessionDateOnly.toISOString().split('T')[0]}`,
+            sessionCount: currentDateGroup.length
+        });
         currentDateGroup.forEach(sess => {
             listData.push({ type: 'session', session: sess });
         });
@@ -275,6 +322,9 @@ export const storage = create<StorageState>()((set, get) => {
         sessionGitStatus: {},
         realtimeStatus: 'disconnected',
         realtimeMode: 'idle',
+        realtimeMuted: false,
+        realtimePTTMode: false,
+        realtimePTTWaitingForResponse: false,
         socketStatus: 'disconnected',
         socketLastConnectedAt: null,
         socketLastDisconnectedAt: null,
@@ -443,7 +493,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Build new unified list view data
             const sessionListViewData = buildSessionListViewData(
-                mergedSessions
+                mergedSessions,
+                state.localSettings.pinnedSessions
             );
 
             // Update project manager with current sessions and machines
@@ -719,6 +770,18 @@ export const storage = create<StorageState>()((set, get) => {
                 realtimeModeDebounceTimer = null;
             }
         },
+        setRealtimeMuted: (muted: boolean) => set((state) => ({
+            ...state,
+            realtimeMuted: muted
+        })),
+        setRealtimePTTMode: (active: boolean) => set((state) => ({
+            ...state,
+            realtimePTTMode: active
+        })),
+        setRealtimePTTWaitingForResponse: (waiting: boolean) => set((state) => ({
+            ...state,
+            realtimePTTWaitingForResponse: waiting
+        })),
         setSocketStatus: (status: 'disconnected' | 'connecting' | 'connected' | 'error') => set((state) => {
             const now = Date.now();
             const updates: Partial<StorageState> = {
@@ -769,7 +832,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Rebuild sessionListViewData to update the UI immediately
             const sessionListViewData = buildSessionListViewData(
-                updatedSessions
+                updatedSessions,
+                state.localSettings.pinnedSessions
             );
 
             return {
@@ -860,7 +924,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Rebuild sessionListViewData to reflect machine changes
             const sessionListViewData = buildSessionListViewData(
-                state.sessions
+                state.sessions,
+                state.localSettings.pinnedSessions
             );
 
             return {
@@ -922,25 +987,35 @@ export const storage = create<StorageState>()((set, get) => {
             
             // Remove session git status if it exists
             const { [sessionId]: deletedGitStatus, ...remainingGitStatus } = state.sessionGitStatus;
-            
+
             // Clear drafts and permission modes from persistent storage
             const drafts = loadSessionDrafts();
             delete drafts[sessionId];
             saveSessionDrafts(drafts);
-            
+
             const modes = loadSessionPermissionModes();
             delete modes[sessionId];
             saveSessionPermissionModes(modes);
-            
+
+            // Remove from pinned sessions if present
+            const updatedPinnedSessions = state.localSettings.pinnedSessions.filter(id => id !== sessionId);
+            const updatedLocalSettings = updatedPinnedSessions.length !== state.localSettings.pinnedSessions.length
+                ? { ...state.localSettings, pinnedSessions: updatedPinnedSessions }
+                : state.localSettings;
+            if (updatedPinnedSessions.length !== state.localSettings.pinnedSessions.length) {
+                saveLocalSettings(updatedLocalSettings);
+            }
+
             // Rebuild sessionListViewData without the deleted session
-            const sessionListViewData = buildSessionListViewData(remainingSessions);
-            
+            const sessionListViewData = buildSessionListViewData(remainingSessions, updatedPinnedSessions);
+
             return {
                 ...state,
                 sessions: remainingSessions,
                 sessionMessages: remainingSessionMessages,
                 sessionGitStatus: remainingGitStatus,
-                sessionListViewData
+                sessionListViewData,
+                localSettings: updatedLocalSettings
             };
         }),
         // Friend management methods
@@ -1066,6 +1141,74 @@ export const storage = create<StorageState>()((set, get) => {
             feedLoaded: false,  // Reset loading flag
             friendsLoaded: false  // Reset loading flag
         })),
+        // Session pinning methods
+        pinSession: (sessionId: string) => set((state) => {
+            // Don't pin if already pinned
+            if (state.localSettings.pinnedSessions.includes(sessionId)) {
+                return state;
+            }
+            const updatedPinnedSessions = [sessionId, ...state.localSettings.pinnedSessions];
+            const updatedLocalSettings = { ...state.localSettings, pinnedSessions: updatedPinnedSessions };
+            saveLocalSettings(updatedLocalSettings);
+            const sessionListViewData = buildSessionListViewData(state.sessions, updatedPinnedSessions);
+            return {
+                ...state,
+                localSettings: updatedLocalSettings,
+                sessionListViewData
+            };
+        }),
+        unpinSession: (sessionId: string) => set((state) => {
+            // Don't unpin if not pinned
+            if (!state.localSettings.pinnedSessions.includes(sessionId)) {
+                return state;
+            }
+            const updatedPinnedSessions = state.localSettings.pinnedSessions.filter(id => id !== sessionId);
+            const updatedLocalSettings = { ...state.localSettings, pinnedSessions: updatedPinnedSessions };
+            saveLocalSettings(updatedLocalSettings);
+            const sessionListViewData = buildSessionListViewData(state.sessions, updatedPinnedSessions);
+            return {
+                ...state,
+                localSettings: updatedLocalSettings,
+                sessionListViewData
+            };
+        }),
+        isSessionPinned: (sessionId: string) => {
+            return get().localSettings.pinnedSessions.includes(sessionId);
+        },
+        // Voice transcript method - adds voice messages to session for local display only
+        addVoiceMessage: (sessionId: string, type: 'user' | 'assistant', text: string) => set((state) => {
+            const existingSession = state.sessionMessages[sessionId];
+            if (!existingSession) {
+                return state;
+            }
+
+            const messageId = `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const now = Date.now();
+
+            const voiceMessage: Message = type === 'user'
+                ? { kind: 'voice-user', id: messageId, createdAt: now, text }
+                : { kind: 'voice-assistant', id: messageId, createdAt: now, text };
+
+            const mergedMessagesMap = {
+                ...existingSession.messagesMap,
+                [messageId]: voiceMessage
+            };
+
+            const messagesArray = Object.values(mergedMessagesMap)
+                .sort((a, b) => b.createdAt - a.createdAt);
+
+            return {
+                ...state,
+                sessionMessages: {
+                    ...state.sessionMessages,
+                    [sessionId]: {
+                        ...existingSession,
+                        messages: messagesArray,
+                        messagesMap: mergedMessagesMap
+                    }
+                }
+            };
+        }),
     }
 });
 
@@ -1232,6 +1375,23 @@ export function useRealtimeStatus(): 'disconnected' | 'connecting' | 'connected'
 
 export function useRealtimeMode(): 'idle' | 'speaking' {
     return storage(useShallow((state) => state.realtimeMode));
+}
+
+export function useRealtimeMuted(): boolean {
+    return storage(useShallow((state) => state.realtimeMuted));
+}
+
+export function useRealtimePTTMode(): boolean {
+    return storage(useShallow((state) => state.realtimePTTMode));
+}
+
+export function useRealtimePTTWaitingForResponse(): boolean {
+    return storage(useShallow((state) => state.realtimePTTWaitingForResponse));
+}
+
+export function useVoiceTranscript(): { text: string; role: 'user' | 'assistant' } {
+    // TODO: Implement actual voice transcript tracking
+    return { text: '', role: 'user' };
 }
 
 export function useSocketStatus() {

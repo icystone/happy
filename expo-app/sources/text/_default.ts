@@ -57,6 +57,8 @@ export const en = {
         files: 'Files',
         fileViewer: 'File Viewer',
         loading: 'Loading...',
+        pin: 'Pin',
+        unpin: 'Unpin',
         retry: 'Retry',
         delete: 'Delete',
         optional: 'optional',
@@ -208,6 +210,7 @@ export const en = {
         enhancedSessionWizardEnabled: 'Profile-first session launcher active',
         enhancedSessionWizardDisabled: 'Using standard session launcher',
     },
+
 
     errors: {
         networkError: 'Network error occurred',
@@ -445,6 +448,10 @@ export const en = {
             fileLabel: 'FILE',
             folderLabel: 'FOLDER',
         },
+        plusMenu: {
+            voiceCall: 'Voice call',
+            pushToTalk: 'Push to talk',
+        },
         noMachinesAvailable: 'No machines',
     },
 
@@ -562,7 +569,69 @@ export const en = {
             title: 'Languages',
             footer: ({ count }: { count: number }) => `${count} ${plural({ count, singular: 'language', plural: 'languages' })} available`,
             autoDetect: 'Auto-detect',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'System Prompt',
+        systemPromptDescription: 'Customize the instructions given to the voice assistant.',
+        systemPrompt: 'Custom Prompt',
+        systemPromptSubtitle: 'Define how the voice assistant behaves',
+        systemPromptDefault: 'Default',
+        systemPromptEdit: {
+            description: 'Enter a custom system prompt to change how the voice assistant behaves. Leave empty to use the default prompt.',
+            placeholder: 'Enter your custom system prompt...',
+            reset: 'Clear',
+            useDefault: 'Use Default',
+            hint: 'The system prompt defines the voice assistant\'s personality and capabilities. It will be combined with session context when starting a voice session.',
+        },
+        // Provider settings
+        providerTitle: 'Voice Provider',
+        providerDescription: 'Select and configure your voice assistant provider',
+        providerLabel: 'Provider',
+        providerSubtitle: 'Choose which voice service to use',
+        providerNotConfigured: 'Not configured',
+        provider: {
+            selectTitle: 'Select Provider',
+            selectDescription: 'Choose a voice provider for real-time voice interactions',
+            stepfunConfig: 'StepFun Configuration',
+            stepfunConfigDescription: 'Configure your StepFun API credentials and preferences',
+            elevenLabsConfig: 'ElevenLabs Configuration',
+            elevenLabsConfigDescription: 'Configure your ElevenLabs agent settings',
+            apiKeyPlaceholder: 'Enter your StepFun API key',
+            model: 'Model',
+            voice: 'Voice',
+            agentIdDevPlaceholder: 'Agent ID (Development)',
+            agentIdProdPlaceholder: 'Agent ID (Production)',
+        },
+        // ASR (Speech-to-Text) settings
+        asr: {
+            title: 'Voice Input (ASR)',
+            description: 'Speech-to-text for voice input mode',
+            apiKeyNote: 'Note: StepFun ASR uses the same API key as the voice provider above. Please configure it in the StepFun section.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Connecting...',
+            speaking: 'Speaking',
+            listening: 'Listening...',
+            muted: 'Muted',
+            voiceAssistant: 'Voice Assistant',
+            you: 'YOU',
+            assistant: 'ASSISTANT',
+            startSpeaking: 'Start speaking...',
+            waiting: 'Waiting...',
+            microphoneMuted: 'Microphone is muted',
+            end: 'End',
+        },
+    },
+
+    voiceInput: {
+        // Voice input mode translations
+        holdToSpeak: 'Hold to Speak',
+        recording: 'Release to Send',
+        cancel: 'Cancel',
+        slideToText: 'Slide here to convert',
+        releaseToSend: 'Release to Send',
+        transcribing: 'Recognizing...',
     },
 
     settingsAccount: {

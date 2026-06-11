@@ -273,6 +273,22 @@ export const SettingsSchema = z.object({
     reviewPromptAnswered: z.boolean().describe('Whether the review prompt has been answered'),
     reviewPromptLikedApp: z.boolean().nullish().describe('Whether user liked the app when asked'),
     voiceAssistantLanguage: z.string().nullable().describe('Preferred language for voice assistant (null for auto-detect)'),
+    voiceAssistantSystemPrompt: z.string().nullable().describe('Custom system prompt for voice assistant (null for default)'),
+    // Voice provider configuration
+    voiceProvider: z.enum(['stepfun', 'elevenlabs', 'none']).nullable().describe('Selected voice provider'),
+    voiceProviderStepFun: z.object({
+        apiKey: z.string().optional(),
+        modelId: z.string().optional(),
+        voice: z.string().optional(),
+    }).nullable().describe('StepFun voice provider configuration'),
+    voiceProviderElevenLabs: z.object({
+        agentIdDev: z.string().optional(),
+        agentIdProd: z.string().optional(),
+    }).nullable().describe('ElevenLabs voice provider configuration'),
+    // ASR (Speech-to-Text) provider configuration
+    asrProvider: z.enum(['stepfun', 'none']).nullable().describe('Selected ASR provider for voice input'),
+    // Input mode preference (keyboard or voice)
+    inputMode: z.enum(['keyboard', 'voice']).describe('Preferred input mode for message composition'),
     preferredLanguage: z.string().nullable().describe('Preferred UI language (null for auto-detect from device locale)'),
     recentMachinePaths: z.array(z.object({
         machineId: z.string(),
@@ -342,6 +358,14 @@ export const settingsDefaults: Settings = {
     reviewPromptAnswered: false,
     reviewPromptLikedApp: null,
     voiceAssistantLanguage: null,
+    voiceAssistantSystemPrompt: null,
+    // Voice provider defaults
+    voiceProvider: null,
+    voiceProviderStepFun: null,
+    voiceProviderElevenLabs: null,
+    // ASR defaults
+    asrProvider: null,
+    inputMode: 'keyboard',
     preferredLanguage: null,
     recentMachinePaths: [],
     lastUsedAgent: null,

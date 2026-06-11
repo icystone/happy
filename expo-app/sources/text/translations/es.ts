@@ -210,6 +210,7 @@ export const es: TranslationStructure = {
         enhancedSessionWizardDisabled: 'Usando el lanzador de sesión estándar',
     },
 
+
     errors: {
         networkError: 'Error de conexión',
         serverError: 'Error del servidor',
@@ -433,10 +434,10 @@ export const es: TranslationStructure = {
             title: 'MODO DE PERMISOS GEMINI',
             default: 'Por defecto',
             readOnly: 'Solo lectura',
-            safeYolo: 'YOLO seguro',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: 'Solo lectura',
-            badgeSafeYolo: 'YOLO seguro',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -445,6 +446,10 @@ export const es: TranslationStructure = {
         suggestion: {
             fileLabel: 'ARCHIVO',
             folderLabel: 'CARPETA',
+        },
+        plusMenu: {
+            voiceCall: 'Llamada de voz',
+            pushToTalk: 'Pulsa para hablar',
         },
         noMachinesAvailable: 'Sin máquinas',
     },
@@ -563,7 +568,69 @@ export const es: TranslationStructure = {
             title: 'Idiomas',
             footer: ({ count }: { count: number }) => `${count} ${plural({ count, singular: 'idioma', plural: 'idiomas' })} disponibles`,
             autoDetect: 'Detectar automáticamente',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: 'Prompt del sistema',
+        systemPromptDescription: 'Personaliza las instrucciones dadas al asistente de voz',
+        systemPrompt: 'Prompt personalizado',
+        systemPromptSubtitle: 'Define cómo se comporta el asistente de voz',
+        systemPromptDefault: 'Predeterminado',
+        systemPromptEdit: {
+            description: 'Ingresa un prompt de sistema personalizado para cambiar cómo se comporta el asistente de voz. Deja vacío para usar el prompt predeterminado.',
+            placeholder: 'Ingresa tu prompt de sistema personalizado...',
+            reset: 'Limpiar',
+            useDefault: 'Usar predeterminado',
+            hint: 'El prompt del sistema define la personalidad y capacidades del asistente de voz. Se combinará con el contexto de la sesión al iniciar una sesión de voz.',
+        },
+        // Provider settings
+        providerTitle: 'Proveedor de voz',
+        providerDescription: 'Selecciona y configura tu proveedor de asistente de voz',
+        providerLabel: 'Proveedor',
+        providerSubtitle: 'Elige qué servicio de voz usar',
+        providerNotConfigured: 'No configurado',
+        provider: {
+            selectTitle: 'Seleccionar proveedor',
+            selectDescription: 'Elige un proveedor de voz para interacciones de voz en tiempo real',
+            stepfunConfig: 'Configuración de StepFun',
+            stepfunConfigDescription: 'Configura tus credenciales y preferencias de API de StepFun',
+            elevenLabsConfig: 'Configuración de ElevenLabs',
+            elevenLabsConfigDescription: 'Configura los ajustes del agente de ElevenLabs',
+            apiKeyPlaceholder: 'Ingresa tu clave API de StepFun',
+            model: 'Modelo',
+            voice: 'Voz',
+            agentIdDevPlaceholder: 'Agent ID (Desarrollo)',
+            agentIdProdPlaceholder: 'Agent ID (Producción)',
+        },
+        // ASR (reconocimiento de voz) configuración
+        asr: {
+            title: 'Entrada de voz (ASR)',
+            description: 'Conversión de voz a texto para el modo de entrada de voz',
+            apiKeyNote: 'Nota: StepFun ASR usa la misma clave API que el proveedor de voz anterior. Por favor, configúrela en la sección de StepFun.',
+        },
+        // Voice panel
+        panel: {
+            connecting: 'Conectando...',
+            speaking: 'Hablando',
+            listening: 'Escuchando...',
+            muted: 'Silenciado',
+            voiceAssistant: 'Asistente de voz',
+            you: 'TU',
+            assistant: 'ASISTENTE',
+            startSpeaking: 'Empieza a hablar...',
+            waiting: 'Esperando...',
+            microphoneMuted: 'El micrófono está silenciado',
+            end: 'Finalizar',
+        },
+    },
+
+    // Superposición de entrada de voz
+    voiceInput: {
+        holdToSpeak: 'Mantén presionado para hablar',
+        recording: 'Suelta para enviar',
+        cancel: 'Cancelar',
+        slideToText: 'Desliza aquí para convertir',
+        releaseToSend: 'Suelta para enviar',
+        transcribing: 'Reconociendo...',
     },
 
     settingsAccount: {

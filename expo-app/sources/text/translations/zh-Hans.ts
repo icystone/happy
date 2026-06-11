@@ -59,6 +59,8 @@ export const zhHans: TranslationStructure = {
         files: '文件',
         fileViewer: '文件查看器',
         loading: '加载中...',
+        pin: '置顶',
+        unpin: '取消置顶',
         retry: '重试',
         delete: '删除',
         optional: '可选的',
@@ -435,10 +437,10 @@ export const zhHans: TranslationStructure = {
             title: 'GEMINI 权限模式',
             default: '默认',
             readOnly: '只读',
-            safeYolo: '安全 YOLO',
+            safeYolo: 'Safe YOLO',
             yolo: 'YOLO',
             badgeReadOnly: '只读',
-            badgeSafeYolo: '安全 YOLO',
+            badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
         context: {
@@ -447,6 +449,10 @@ export const zhHans: TranslationStructure = {
         suggestion: {
             fileLabel: '文件',
             folderLabel: '文件夹',
+        },
+        plusMenu: {
+            voiceCall: '语音通话',
+            pushToTalk: '按住说话',
         },
         noMachinesAvailable: '无设备',
     },
@@ -565,7 +571,69 @@ export const zhHans: TranslationStructure = {
             title: '语言',
             footer: ({ count }: { count: number }) => `${count} 种可用语言`,
             autoDetect: '自动检测',
-        }
+        },
+        // System prompt settings
+        systemPromptTitle: '系统提示词',
+        systemPromptDescription: '自定义给语音助手的指令',
+        systemPrompt: '自定义提示词',
+        systemPromptSubtitle: '定义语音助手的行为方式',
+        systemPromptDefault: '默认',
+        systemPromptEdit: {
+            description: '输入自定义系统提示词来改变语音助手的行为。留空则使用默认提示词。',
+            placeholder: '输入您的自定义系统提示词...',
+            reset: '清除',
+            useDefault: '使用默认',
+            hint: '系统提示词定义了语音助手的个性和能力。启动语音会话时，它将与会话上下文结合使用。',
+        },
+        // Provider settings
+        providerTitle: '语音服务提供商',
+        providerDescription: '选择并配置您的语音助手提供商',
+        providerLabel: '提供商',
+        providerSubtitle: '选择使用哪个语音服务',
+        providerNotConfigured: '未配置',
+        provider: {
+            selectTitle: '选择提供商',
+            selectDescription: '为实时语音交互选择语音提供商',
+            stepfunConfig: 'StepFun 配置',
+            stepfunConfigDescription: '配置您的 StepFun API 凭证和偏好设置',
+            elevenLabsConfig: 'ElevenLabs 配置',
+            elevenLabsConfigDescription: '配置您的 ElevenLabs 代理设置',
+            apiKeyPlaceholder: '输入您的 StepFun API 密钥',
+            model: '模型',
+            voice: '语音',
+            agentIdDevPlaceholder: 'Agent ID（开发环境）',
+            agentIdProdPlaceholder: 'Agent ID（生产环境）',
+        },
+        // ASR (语音转文字) 设置
+        asr: {
+            title: '语音输入 (ASR)',
+            description: '语音输入模式的语音转文字功能',
+            apiKeyNote: '注意：StepFun ASR 使用与上方语音服务提供商相同的 API 密钥。请在 StepFun 部分进行配置。',
+        },
+        // Voice panel
+        panel: {
+            connecting: '连接中...',
+            speaking: '正在说话',
+            listening: '正在听...',
+            muted: '已静音',
+            voiceAssistant: '语音助手',
+            you: '你',
+            assistant: '助手',
+            startSpeaking: '开始说话...',
+            waiting: '等待中...',
+            microphoneMuted: '麦克风已静音',
+            end: '结束',
+        },
+    },
+
+    // 语音输入覆盖层
+    voiceInput: {
+        holdToSpeak: '按住说话',
+        recording: '松开发送',
+        cancel: '取消',
+        slideToText: '滑动到此处转换',
+        releaseToSend: '松开发送',
+        transcribing: '识别中...',
     },
 
     settingsAccount: {

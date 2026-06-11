@@ -3,12 +3,13 @@ import { View, Pressable, FlatList, Platform } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Text } from '@/components/StyledText';
 import { usePathname } from 'expo-router';
-import { SessionListViewItem } from '@/sync/storage';
+import { SessionListViewItem, storage, useLocalSetting } from '@/sync/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { getSessionName, useSessionStatus, getSessionSubtitle, getSessionAvatarId } from '@/utils/sessionUtils';
 import { Avatar } from './Avatar';
 import { ActiveSessionsGroup } from './ActiveSessionsGroup';
 import { ActiveSessionsGroupCompact } from './ActiveSessionsGroupCompact';
+import { CollapsibleSectionHeader } from './CollapsibleSectionHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSetting } from '@/sync/storage';
 import { useVisibleSessionListViewData } from '@/hooks/useVisibleSessionListViewData';
@@ -185,6 +186,13 @@ const stylesheet = StyleSheet.create((theme) => ({
         justifyContent: 'center',
         backgroundColor: theme.colors.status.error,
     },
+    swipeActionPin: {
+        width: 112,
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.status.connected,
+    },
     swipeActionText: {
         marginTop: 4,
         fontSize: 12,
@@ -205,6 +213,8 @@ export function SessionsList() {
     const router = useRouter();
     const selectable = isTablet;
     const experiments = useSetting('experiments');
+    const pinnedSessions = useLocalSetting('pinnedSessions');
+    const pinnedSet = React.useMemo(() => new Set(pinnedSessions), [pinnedSessions]);
     const dataWithSelected = selectable ? React.useMemo(() => {
         return data?.map(item => ({
             ...item,
@@ -238,6 +248,15 @@ export function SessionsList() {
     const renderItem = React.useCallback(({ item, index }: { item: SessionListViewItem & { selected?: boolean }, index: number }) => {
         switch (item.type) {
             case 'header':
+                if (item.collapsible && item.sectionId) {
+                    return (
+                        <CollapsibleSectionHeader
+                            title={item.title}
+                            sectionId={item.sectionId}
+                            sessionCount={item.sessionCount}
+                        />
+                    );
+                }
                 return (
                     <View style={styles.headerSection}>
                         <Text style={styles.headerText}>
@@ -290,10 +309,11 @@ export function SessionsList() {
                         isFirst={isFirst}
                         isLast={isLast}
                         isSingle={isSingle}
+                        isPinned={pinnedSet.has(item.session.id)}
                     />
                 );
         }
-    }, [pathname, dataWithSelected, compactSessionView]);
+    }, [pathname, dataWithSelected, compactSessionView, pinnedSet]);
 
 
     // Remove this section as we'll use FlatList for all items now
@@ -323,12 +343,13 @@ export function SessionsList() {
 }
 
 // Sub-component that handles session message logic
-const SessionItem = React.memo(({ session, selected, isFirst, isLast, isSingle }: {
+const SessionItem = React.memo(({ session, selected, isFirst, isLast, isSingle, isPinned }: {
     session: Session;
     selected?: boolean;
     isFirst?: boolean;
     isLast?: boolean;
     isSingle?: boolean;
+    isPinned?: boolean;
 }) => {
     const styles = stylesheet;
     const sessionStatus = useSessionStatus(session);
@@ -361,6 +382,15 @@ const SessionItem = React.memo(({ session, selected, isFirst, isLast, isSingle }
             ]
         );
     }, [performDelete]);
+
+    const handleTogglePin = React.useCallback(() => {
+        swipeableRef.current?.close();
+        if (isPinned) {
+            storage.getState().unpinSession(session.id);
+        } else {
+            storage.getState().pinSession(session.id);
+        }
+    }, [session.id, isPinned]);
 
     const avatarId = React.useMemo(() => {
         return getSessionAvatarId(session);
@@ -458,12 +488,26 @@ const SessionItem = React.memo(({ session, selected, isFirst, isLast, isSingle }
         </Pressable>
     );
 
+    const renderLeftActions = () => (
+        <Pressable
+            style={styles.swipeActionPin}
+            onPress={handleTogglePin}
+        >
+            <Ionicons name={isPinned ? "pin-outline" : "pin"} size={20} color="#FFFFFF" />
+            <Text style={styles.swipeActionText} numberOfLines={1}>
+                {isPinned ? t('common.unpin') : t('common.pin')}
+            </Text>
+        </Pressable>
+    );
+
     return (
         <View style={containerStyles}>
             <Swipeable
                 ref={swipeableRef}
                 renderRightActions={renderRightActions}
+                renderLeftActions={renderLeftActions}
                 overshootRight={false}
+                overshootLeft={false}
                 enabled={!deletingSession}
             >
                 {itemContent}
